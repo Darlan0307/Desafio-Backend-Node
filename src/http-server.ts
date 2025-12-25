@@ -6,6 +6,7 @@ import { createUsersRoutes } from "@app/users/http"
 import { TokenService } from "@infra/service/token-service"
 import { PasswordService } from "@infra/service/password-service"
 import { env } from "@infra/env"
+import { createAuthMiddleware } from "@infra/middlewares"
 
 export default class HttpServer {
   private app: Express
@@ -32,8 +33,8 @@ export default class HttpServer {
 
   private loadMiddlewares(): void {
     this.app.use(cors())
-
     this.app.use(express.json())
+    this.app.use(createAuthMiddleware(this.passwordService, this.tokenService))
   }
 
   private loadRoutes(): void {

@@ -48,6 +48,16 @@ export class MongooseUserRepository implements UserRepository {
     }
   }
 
+  async getById(id: string): Promise<UserData | null> {
+    const user = await User.findById(id)
+
+    if (!user) {
+      return null
+    }
+
+    return this.mapToUserData(user)
+  }
+
   async getByEmail(email: string): Promise<UserData | null> {
     const user = await User.findOne({ email })
 
