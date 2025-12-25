@@ -1,7 +1,7 @@
 {
-  "name": ".",
+  "name": "desafio-backend-nodejs",
   "version": "1.0.0",
-  "description": "API gerada com api boilerplate",
+  "description": "Projeto de desafio de Backend NodeJS",
   "main": "dist/src/main.js",
   "scripts": {
     "start": "NODE_ENV=production node -r dotenv/config dist/src/main.js",
@@ -22,11 +22,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "mongoose": "^9.0.2",
     "pino": "^9.5.0",
     "pino-pretty": "^13.0.0",
     "resolve-tspaths": "^0.8.19",
     "rimraf": "^6.0.1",
-    "tsconfig-paths": "^4.2.0"
+    "tsconfig-paths": "^4.2.0",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",

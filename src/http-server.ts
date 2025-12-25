@@ -1,6 +1,7 @@
 import express, { Request, Response, Express, Router } from "express"
 import cors from "cors"
 import { logger } from "@infra/logger"
+import { connectDatabase, disconnectDatabase } from "@infra/database/mongoose"
 
 export default class HttpServer {
   private app: Express
@@ -10,6 +11,7 @@ export default class HttpServer {
   }
 
   async createApp(): Promise<Express> {
+    await connectDatabase()
     this.loadMiddlewares()
     this.loadRoutes()
     return this.app
@@ -17,6 +19,7 @@ export default class HttpServer {
 
   async stop(): Promise<void> {
     logger.info("Stopping...")
+    await disconnectDatabase()
   }
 
   private loadMiddlewares(): void {

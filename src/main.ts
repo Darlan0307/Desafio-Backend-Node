@@ -1,5 +1,6 @@
 import { logger } from "@infra/logger"
 import HttpServer from "./http-server"
+import { env } from "@infra/env"
 
 enum ExitStatus {
   Failure = 1,
@@ -8,7 +9,7 @@ enum ExitStatus {
 
 async function main() {
   try {
-    const PORT = process.env.PORT || 3000
+    const PORT = env.PORT
     const httpServer = new HttpServer()
     const port = Number(PORT)
     const exitSignals: NodeJS.Signals[] = ["SIGINT", "SIGTERM", "SIGQUIT"]
