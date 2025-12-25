@@ -2,12 +2,20 @@ import express, { Request, Response, Express, Router } from "express"
 import cors from "cors"
 import { logger } from "@infra/logger"
 import { connectDatabase, disconnectDatabase } from "@infra/database/mongoose"
+import { createUsersRoutes } from "@app/users/http"
+import { TokenService } from "@infra/service/token-service"
+import { PasswordService } from "@infra/service/password-service"
+import { env } from "@infra/env"
 
 export default class HttpServer {
   private app: Express
+  private passwordService: PasswordService
+  private tokenService: TokenService
 
   constructor() {
     this.app = express()
+    this.passwordService = new PasswordService(env.PASSWORD_SALT_ROUNDS)
+    this.tokenService = new TokenService(env.TOKEN_SECRET, env.TOKEN_EXPIRES_IN)
   }
 
   async createApp(): Promise<Express> {
@@ -41,6 +49,8 @@ export default class HttpServer {
 
     const router = Router()
     this.app.use(router)
+
+    createUsersRoutes(router, this.passwordService, this.tokenService)
 
     this.app.use((req: Request, res: Response) => {
       res.status(404).json({
