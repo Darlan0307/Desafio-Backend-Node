@@ -1,0 +1,9 @@
+comandos shell
+
+docker exec -it container_mongodb_test mongosh
+
+---
+show dbs
+use database_mongodb
+show collections
+db.users.find()
