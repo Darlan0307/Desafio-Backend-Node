@@ -18,6 +18,7 @@ export enum ServiceStatus {
 }
 
 export type OrderData = {
+  id: string
   lab: string
   patient: string
   customer: string

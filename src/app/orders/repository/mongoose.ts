@@ -1,11 +1,11 @@
 import { Order } from "@models/order"
-import { NewOrderData } from "../schema"
+import { NewOrderData, OrderPatchStateData } from "../schema"
 import { OrderData, OrderDocumentPopulated, OrderListQueries } from "../types"
 import { OrderRepository } from "./repository"
 import { buildPagination } from "@shared/repository"
 import { buildWhereCondition } from "../helpers"
 import { DataListResponse } from "src/@types/global-types"
-import { CreateEntityError } from "@infra/errors"
+import { CreateEntityError, GetEntityError, UpdateEntityError } from "@infra/errors"
 
 export class MongooseOrderRepository implements OrderRepository {
   async create(userId: string, data: NewOrderData): Promise<OrderData> {
@@ -29,6 +29,22 @@ export class MongooseOrderRepository implements OrderRepository {
       return this.mapToOrderData(populatedOrder)
     } catch (error) {
       throw new CreateEntityError("Erro ao criar o pedido: " + JSON.stringify(error))
+    }
+  }
+
+  async get(id: string): Promise<OrderData | null> {
+    try {
+      const order = await Order.findById(id)
+        .populate("userId", "_id email")
+        .lean<OrderDocumentPopulated>()
+
+      if (!order) {
+        return null
+      }
+
+      return this.mapToOrderData(order)
+    } catch (error) {
+      throw new GetEntityError("Erro ao obter o pedido: " + JSON.stringify(error))
     }
   }
 
@@ -63,8 +79,33 @@ export class MongooseOrderRepository implements OrderRepository {
     }
   }
 
+  async updateState(id: string, data: OrderPatchStateData): Promise<OrderData> {
+    try {
+      const newOrder = await Order.findByIdAndUpdate(
+        id,
+        {
+          state: data.state
+        },
+        {
+          new: true
+        }
+      )
+        .populate("userId", "_id email")
+        .lean<OrderDocumentPopulated>()
+
+      if (!newOrder) {
+        throw new UpdateEntityError("Erro ao atualizar o pedido")
+      }
+
+      return this.mapToOrderData(newOrder)
+    } catch (error) {
+      throw new UpdateEntityError("Erro ao atualizar o pedido: " + JSON.stringify(error))
+    }
+  }
+
   private mapToOrderData(order: OrderDocumentPopulated): OrderData {
     return {
+      id: order._id.toString(),
       lab: order.lab,
       patient: order.patient,
       customer: order.customer,

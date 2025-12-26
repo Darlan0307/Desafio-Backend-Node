@@ -6,12 +6,19 @@ import {
   makeResponse,
   removeUndefinedFields
 } from "@shared/http"
-import { OrderCreateUseCase, OrderListUseCase } from "../use-cases"
+import {
+  OrderCreateUseCase,
+  OrderGetUseCase,
+  OrderListUseCase,
+  OrderPatchStateUseCase
+} from "../use-cases"
 import { OrderListQueries } from "../types"
 
 export type UseCases = {
   create: OrderCreateUseCase
   list: OrderListUseCase
+  get: OrderGetUseCase
+  patchState: OrderPatchStateUseCase
 }
 
 export default class OrderHttpConrtoller {
@@ -24,6 +31,23 @@ export default class OrderHttpConrtoller {
     const result = await this.useCases.create.execute(userId, input)
 
     return makeResponse(result, created)
+  }
+
+  async patchState(request: HttpRequest): Promise<HttpResponse> {
+    const orderId = request?.params?.id ?? ""
+    const input = removeUndefinedFields(request?.body ?? {})
+
+    const result = await this.useCases.patchState.execute(orderId, input)
+
+    return makeResponse(result)
+  }
+
+  async get(request: HttpRequest): Promise<HttpResponse> {
+    const orderId = request?.params?.id ?? ""
+
+    const result = await this.useCases.get.execute(orderId)
+
+    return makeResponse(result)
   }
 
   async list(request: HttpRequest): Promise<HttpResponse> {

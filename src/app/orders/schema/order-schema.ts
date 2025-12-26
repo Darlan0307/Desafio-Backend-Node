@@ -1,5 +1,5 @@
 import z from "zod"
-import { ServiceStatus } from "../types"
+import { OrderState, ServiceStatus } from "../types"
 
 export const OrderSchema = z
   .object({
@@ -35,4 +35,14 @@ export const OrderSchema = z
   })
   .strict()
 
+export const OrderPatchStateSchema = z
+  .object({
+    state: z.enum(Object.values(OrderState), {
+      error: "O campo 'state' deve ser um dos seguintes valores: CREATED, ANALYSI ou COMPLETED"
+    })
+  })
+  .strict()
+
 export type NewOrderData = z.infer<typeof OrderSchema>
+
+export type OrderPatchStateData = z.infer<typeof OrderPatchStateSchema>

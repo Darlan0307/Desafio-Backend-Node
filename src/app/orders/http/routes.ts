@@ -4,7 +4,12 @@ import { TokenService } from "@infra/service/token-service"
 import { MongooseUserRepository } from "@app/users/repository"
 import { MongooseOrderRepository } from "../repository"
 import OrderHttpConrtoller from "./controller"
-import { OrderCreateUseCase, OrderListUseCase } from "../use-cases"
+import {
+  OrderCreateUseCase,
+  OrderGetUseCase,
+  OrderListUseCase,
+  OrderPatchStateUseCase
+} from "../use-cases"
 
 export async function createOrdersRoutes(
   router: Router,
@@ -16,7 +21,9 @@ export async function createOrdersRoutes(
 
   const controller = new OrderHttpConrtoller({
     create: new OrderCreateUseCase(userRepository, orderRepository),
-    list: new OrderListUseCase(orderRepository)
+    patchState: new OrderPatchStateUseCase(orderRepository),
+    list: new OrderListUseCase(orderRepository),
+    get: new OrderGetUseCase(orderRepository)
   })
 
   router.post("/orders", async (req: Request, res: Response) => {
@@ -24,8 +31,18 @@ export async function createOrdersRoutes(
     res.status(httpResponse.statusCode).json(httpResponse.body)
   })
 
+  router.patch("/orders/:id/advance", async (req: Request, res: Response) => {
+    const httpResponse = await controller.patchState(req)
+    res.status(httpResponse.statusCode).json(httpResponse.body)
+  })
+
   router.get("/orders", async (req: Request, res: Response) => {
     const httpResponse = await controller.list(req)
+    res.status(httpResponse.statusCode).json(httpResponse.body)
+  })
+
+  router.get("/orders/:id", async (req: Request, res: Response) => {
+    const httpResponse = await controller.get(req)
     res.status(httpResponse.statusCode).json(httpResponse.body)
   })
 }
