@@ -2,10 +2,10 @@ import { BaseUseCase } from "@shared/use-cases"
 import { LoginSchema, UserLoginData } from "../schema"
 import { UserLoginResponse } from "../types"
 import { LoginError, UnauthorizedActionError } from "@infra/errors"
-import { MongooseUserRepository } from "../repository"
+import { UserRepository } from "../repository"
 
 export class UserLoginUseCase extends BaseUseCase<UserLoginData, UserLoginResponse, LoginError> {
-  constructor(private repository: MongooseUserRepository) {
+  constructor(private repository: UserRepository) {
     super(LoginError, "Erro ao tentar logar no sistema", LoginSchema)
   }
 

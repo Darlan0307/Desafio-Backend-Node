@@ -1,11 +1,6 @@
 import { QueryFilter } from "mongoose"
 import { IOrderDocument } from "@models/order"
-import { OrderState, OrderStatus } from "./types"
-
-export type OrderFilters = {
-  userId: string
-  state?: OrderState
-}
+import { OrderFilters, OrderState, OrderStatus } from "./types"
 
 export const buildWhereCondition = (filters: OrderFilters): QueryFilter<IOrderDocument> => {
   const where: QueryFilter<IOrderDocument> = {}

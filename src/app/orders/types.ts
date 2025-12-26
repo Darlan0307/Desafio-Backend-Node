@@ -1,4 +1,5 @@
 import { Types } from "mongoose"
+import { PaginationRequest } from "src/@types/global-types"
 
 export enum OrderState {
   CREATED = "CREATED",
@@ -53,4 +54,14 @@ export type OrderDocumentPopulated = {
   services: OrderServiceData[]
   createdAt: Date
   updatedAt: Date
+}
+
+export type OrderFilters = {
+  userId: string
+  state?: OrderState
+}
+
+export type OrderListQueries = {
+  pagination: PaginationRequest
+  filters: OrderFilters
 }

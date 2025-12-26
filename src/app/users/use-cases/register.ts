@@ -2,14 +2,14 @@ import { BaseUseCase } from "@shared/use-cases"
 import { RegisterSchema, UserRegisterData } from "../schema"
 import { UserLoginResponse } from "../types"
 import { ConflictEntityError, CreateEntityError } from "@infra/errors"
-import { MongooseUserRepository } from "../repository"
+import { UserRepository } from "../repository"
 
 export class UserRegisterUseCase extends BaseUseCase<
   UserRegisterData,
   UserLoginResponse,
   CreateEntityError
 > {
-  constructor(private repository: MongooseUserRepository) {
+  constructor(private repository: UserRepository) {
     super(CreateEntityError, "Erro ao criar usuário", RegisterSchema)
   }
 

@@ -1,10 +1,10 @@
 import { Order } from "@models/order"
 import { NewOrderData } from "../schema"
-import { OrderData, OrderDocumentPopulated } from "../types"
+import { OrderData, OrderDocumentPopulated, OrderListQueries } from "../types"
 import { OrderRepository } from "./repository"
 import { buildPagination } from "@shared/repository"
-import { buildWhereCondition, OrderFilters } from "../helpers"
-import { DataListResponse, PaginationRequest } from "src/@types/global-types"
+import { buildWhereCondition } from "../helpers"
+import { DataListResponse } from "src/@types/global-types"
 import { CreateEntityError } from "@infra/errors"
 
 export class MongooseOrderRepository implements OrderRepository {
@@ -32,12 +32,9 @@ export class MongooseOrderRepository implements OrderRepository {
     }
   }
 
-  async list(
-    pagination: PaginationRequest,
-    filters: OrderFilters
-  ): Promise<DataListResponse<OrderData>> {
-    const { skip, limit } = buildPagination(pagination)
-    const whereCondition = buildWhereCondition(filters)
+  async list(queries: OrderListQueries): Promise<DataListResponse<OrderData>> {
+    const { skip, limit } = buildPagination(queries.pagination)
+    const whereCondition = buildWhereCondition(queries.filters)
 
     try {
       const [totalRecords, orders] = await Promise.all([
@@ -50,13 +47,15 @@ export class MongooseOrderRepository implements OrderRepository {
           .lean<OrderDocumentPopulated[]>()
       ])
 
+      const currentPage = queries.pagination.page || 1
+
       const totalPages = Math.ceil(totalRecords / limit)
 
       return {
         data: orders.map((order) => this.mapToOrderData(order)),
         totalRecords,
         totalPages,
-        currentPage: pagination.page,
+        currentPage,
         perPage: limit
       }
     } catch (error) {
