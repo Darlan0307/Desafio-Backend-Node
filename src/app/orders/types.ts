@@ -57,7 +57,6 @@ export type OrderDocumentPopulated = {
 }
 
 export type OrderFilters = {
-  userId: string
   state?: OrderState
 }
 

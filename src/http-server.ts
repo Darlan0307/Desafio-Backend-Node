@@ -7,6 +7,7 @@ import { TokenService } from "@infra/service/token-service"
 import { PasswordService } from "@infra/service/password-service"
 import { env } from "@infra/env"
 import { createAuthMiddleware } from "@infra/middlewares"
+import { createOrdersRoutes } from "@app/orders/http"
 
 export default class HttpServer {
   private app: Express
@@ -52,6 +53,7 @@ export default class HttpServer {
     this.app.use(router)
 
     createUsersRoutes(router, this.passwordService, this.tokenService)
+    createOrdersRoutes(router, this.passwordService, this.tokenService)
 
     this.app.use((req: Request, res: Response) => {
       res.status(404).json({

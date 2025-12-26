@@ -1,18 +1,22 @@
 import z from "zod"
 
-export const RegisterSchema = z.object({
-  email: z.email({ message: "Email inválido" }),
-  password: z
-    .string({ error: "Informe a senha" })
-    .min(8, { message: "Senha deve ter no mínimo 8 caracteres" })
-})
+export const RegisterSchema = z
+  .object({
+    email: z.email({ message: "Email inválido" }),
+    password: z
+      .string({ error: "Informe a senha" })
+      .min(8, { message: "Senha deve ter no mínimo 8 caracteres" })
+  })
+  .strict()
 
-export const LoginSchema = z.object({
-  email: z.email({ message: "Email inválido" }),
-  password: z
-    .string({ error: "Informe a senha" })
-    .min(8, { message: "Senha deve ter no mínimo 8 caracteres" })
-})
+export const LoginSchema = z
+  .object({
+    email: z.email({ message: "Email inválido" }),
+    password: z
+      .string({ error: "Informe a senha" })
+      .min(8, { message: "Senha deve ter no mínimo 8 caracteres" })
+  })
+  .strict()
 
 export type UserRegisterData = z.infer<typeof RegisterSchema>
 

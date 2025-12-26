@@ -8,9 +8,11 @@ import {
   ListEntityError,
   NotFoundError,
   UnauthorizedActionError,
+  UnprocessableEntityError,
   UpdateEntityError
 } from "@infra/errors"
-import { HttpResponse } from "./http-response"
+import { HttpRequest, HttpResponse } from "./http-response"
+import { PaginationRequest } from "src/@types/global-types"
 
 export const badRequest = (error: Error, data: unknown = null): HttpResponse => {
   if (!data) {
@@ -87,6 +89,12 @@ export const conflict = (error?: Error): HttpResponse => ({
   body: { errorMessage: error?.message || "conflict" }
 })
 
+export const unprocessable = (error?: Error): HttpResponse => ({
+  success: false,
+  statusCode: 422,
+  body: { errorMessage: error?.message || "unprocessable" }
+})
+
 export function removeUndefinedFields<T extends Record<string, any>>(input: T): T {
   if (!input) {
     return {} as T
@@ -96,12 +104,30 @@ export function removeUndefinedFields<T extends Record<string, any>>(input: T): 
   return Object.fromEntries(Object.entries(input).filter(([_, value]) => value !== undefined)) as T
 }
 
+export const createPaginationRequest = (req: HttpRequest): PaginationRequest => {
+  let page = Number(req?.query?.page ?? 1)
+  if (isNaN(page) || page < 1) {
+    page = 1
+  }
+
+  let perPage = Number(req?.query?.perPage ?? 50)
+  if (isNaN(perPage) || perPage < 1) {
+    perPage = 50
+  }
+
+  return {
+    page,
+    perPage
+  }
+}
+
 export function makeResponse(result: any, cb: (data?: any) => HttpResponse | null = ok): any {
   const errorMap = new Map([
     [NotFoundError, notFound],
     [InvalidInputError, badRequest],
     [ConflictEntityError, conflict],
     [UnauthorizedActionError, unauthorized],
+    [UnprocessableEntityError, unprocessable],
     [UpdateEntityError, serverError],
     [CreateEntityError, serverError],
     [GetEntityError, serverError],
