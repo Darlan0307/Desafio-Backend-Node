@@ -4,6 +4,7 @@ import { UserData, UserLoginResponse } from "../types"
 import { UserRepository } from "./repository"
 import { IUserDocument, User } from "@models/user"
 import { TokenService } from "@infra/service/token-service"
+import { CreateEntityError, GetEntityError, LoginError } from "@infra/errors"
 
 export class MongooseUserRepository implements UserRepository {
   constructor(
@@ -12,60 +13,76 @@ export class MongooseUserRepository implements UserRepository {
   ) {}
 
   async register(data: UserRegisterData): Promise<UserLoginResponse> {
-    const passwordHash = await this.passwordService.hash(data.password)
+    try {
+      const passwordHash = await this.passwordService.hash(data.password)
 
-    const newUser = await User.create({
-      email: data.email,
-      password: passwordHash
-    })
+      const newUser = await User.create({
+        email: data.email,
+        password: passwordHash
+      })
 
-    const token = this.tokenService.generateAccessToken(newUser._id.toString())
+      const token = this.tokenService.generateAccessToken(newUser._id.toString())
 
-    return {
-      user: this.mapToUserData(newUser),
-      token
+      return {
+        user: this.mapToUserData(newUser),
+        token
+      }
+    } catch (error) {
+      throw new CreateEntityError("Erro ao criar o usuário: " + JSON.stringify(error))
     }
   }
 
   async login(data: UserLoginData): Promise<UserLoginResponse | null> {
-    const user = await User.findOne({ email: data.email })
+    try {
+      const user = await User.findOne({ email: data.email })
 
-    if (!user) {
-      return null
-    }
+      if (!user) {
+        return null
+      }
 
-    const isValidPassword = await this.passwordService.compare(data.password, user.password)
+      const isValidPassword = await this.passwordService.compare(data.password, user.password)
 
-    if (!isValidPassword) {
-      return null
-    }
+      if (!isValidPassword) {
+        return null
+      }
 
-    const token = this.tokenService.generateAccessToken(user._id.toString())
+      const token = this.tokenService.generateAccessToken(user._id.toString())
 
-    return {
-      user: this.mapToUserData(user),
-      token
+      return {
+        user: this.mapToUserData(user),
+        token
+      }
+    } catch (error) {
+      throw new LoginError("Erro ao logar o usuário: " + JSON.stringify(error))
     }
   }
 
   async getById(id: string): Promise<UserData | null> {
-    const user = await User.findById(id)
+    try {
+      const user = await User.findById(id)
 
-    if (!user) {
-      return null
+      if (!user) {
+        return null
+      }
+
+      return this.mapToUserData(user)
+    } catch (error) {
+      throw new GetEntityError("Erro ao obter o usuário: " + JSON.stringify(error))
     }
-
-    return this.mapToUserData(user)
   }
 
   async getByEmail(email: string): Promise<UserData | null> {
-    const user = await User.findOne({ email })
+    try {
+      const user = await User.findOne({ email })
 
-    if (!user) {
-      return null
+      if (!user) {
+        return null
+      }
+
+      return this.mapToUserData(user)
+    } catch (error) {
+      throw new GetEntityError("Erro ao obter o usuário: " + JSON.stringify(error))
     }
-
-    return this.mapToUserData(user)
   }
 
   private mapToUserData(user: IUserDocument): UserData {
