@@ -13,8 +13,7 @@
     "paths": {
       "@app/*": ["./src/app/*"],
       "@infra/*": ["./src/infra/*"],
-      "@shared/*": ["./src/shared/*"],
-      "@models/*": ["./src/models/*"]
+      "@shared/*": ["./src/shared/*"]
     }
   }
 }

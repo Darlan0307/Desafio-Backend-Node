@@ -2,9 +2,9 @@ import { PasswordService } from "@infra/service/password-service"
 import { UserLoginData, UserRegisterData } from "../schema/user-schema"
 import { UserData, UserLoginResponse } from "../types"
 import { UserRepository } from "./repository"
-import { IUserDocument, User } from "@models/user"
 import { TokenService } from "@infra/service/token-service"
 import { CreateEntityError, GetEntityError, LoginError } from "@infra/errors"
+import { IUserDocument, User } from "@infra/models/user"
 
 export class MongooseUserRepository implements UserRepository {
   constructor(

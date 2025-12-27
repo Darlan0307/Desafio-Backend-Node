@@ -1,4 +1,3 @@
-import { Order } from "@models/order"
 import { NewOrderData, OrderPatchStateData } from "../schema"
 import { OrderData, OrderDocumentPopulated, OrderListQueries } from "../types"
 import { OrderRepository } from "./repository"
@@ -6,6 +5,7 @@ import { buildPagination } from "@shared/repository"
 import { buildWhereCondition } from "../helpers"
 import { DataListResponse } from "src/@types/global-types"
 import { CreateEntityError, GetEntityError, UpdateEntityError } from "@infra/errors"
+import { Order } from "@infra/models/order"
 
 export class MongooseOrderRepository implements OrderRepository {
   async create(userId: string, data: NewOrderData): Promise<OrderData> {
